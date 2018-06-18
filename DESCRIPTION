@@ -63,7 +63,8 @@ Imports:
     doSNOW,
     reticulate,
     foreach,
-    hdf5r
+    hdf5r,
+    parallel
 LinkingTo: Rcpp, RcppEigen, RcppProgress
 License: GPL-3 | file LICENSE
 LazyData: true

@@ -161,19 +161,26 @@ RefinedMapping <- function(object, genes.use) {
 #' pmbc_small <- InitialMapping(pbmc_small)
 #' }
 #'
-InitialMapping <- function(object, cells.use = NULL) {
+InitialMapping <- function(object, cells.use = NULL, mc_cores = 2) {
   cells.use <- SetIfNull(x = cells.use, default = colnames(x = object@data))
-  every.prob <- sapply(
-    X = cells.use,
-    FUN = function(x) {
-      return(MapCell(
-        object = object,
-        cell.name = x,
-        do.plot = FALSE,
-        safe.use = FALSE
-      ))
-    }
-  )
+
+  # every.prob <- sapply(
+  #   X = cells.use,
+  #   FUN = function(x) {
+  #     return(MapCell(
+  #       object = object,
+  #       cell.name = x,
+  #       do.plot = FALSE,
+  #       safe.use = FALSE
+  #     ))
+  #   }
+
+  #- parallel
+  every.prob <- mclapply(X = cells.use, FUN = function(x) {
+        return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
+    }, mc.cores = mc_cores)
+  every.prob  <-  do.call(cbind, every.prob)
+  colnames(every.prob) <- cells.use
   object@spatial@final.prob <- data.frame(every.prob)
   rownames(x = object@spatial@final.prob) <- paste0("bin.", rownames(x = object@spatial@final.prob))
   return(object)

@@ -3,6 +3,14 @@
 [![CRAN Version](https://www.r-pkg.org/badges/version/Seurat)](https://cran.r-project.org/package=Seurat)
 [![CRAN Downloads](https://cranlogs.r-pkg.org/badges/Seurat)](https://cran.r-project.org/package=Seurat)
 
+
+
+```
+install_github("ccshao/seurat")
+```
+
+
+
 # Seurat v2.3
 
 

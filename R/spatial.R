@@ -176,7 +176,7 @@ InitialMapping <- function(object, cells.use = NULL, mc_cores = 2) {
   #   }
 
   #- parallel
-  every.prob <- mclapply(X = cells.use, FUN = function(x) {
+  every.prob <- parallel::mclapply(X = cells.use, FUN = function(x) {
         return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
     }, mc.cores = mc_cores)
   every.prob  <-  do.call(cbind, every.prob)

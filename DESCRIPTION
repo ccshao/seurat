@@ -22,6 +22,8 @@ Depends:
     Matrix (>= 1.2.14),
 SystemRequirements: Java (>= 6)
 Imports:
+    future,
+    future.apply,
     methods,
     ROCR,
     stringr,

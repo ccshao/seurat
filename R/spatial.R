@@ -161,24 +161,29 @@ RefinedMapping <- function(object, genes.use) {
 #' pmbc_small <- InitialMapping(pbmc_small)
 #' }
 #'
-InitialMapping <- function(object, cells.use = NULL, mc_cores = 2) {
+InitialMapping <- function(object, cells.use = NULL, ncore = 2) {
   cells.use <- SetIfNull(x = cells.use, default = colnames(x = object@data))
 
-  # every.prob <- sapply(
-  #   X = cells.use,
-  #   FUN = function(x) {
-  #     return(MapCell(
-  #       object = object,
-  #       cell.name = x,
-  #       do.plot = FALSE,
-  #       safe.use = FALSE
-  #     ))
-  #   }
+  browser()
+  every.prob2 <- sapply(
+    X = cells.use,
+    FUN = function(x) {
+      return(MapCell(
+        object = object,
+        cell.name = x,
+        do.plot = FALSE,
+        safe.use = FALSE
+      ))
+    })
 
   #- parallel
-  every.prob <- parallel::mclapply(X = cells.use, FUN = function(x) {
+  future::plan(multiprocess, workers = ncore)
+  every.prob <- future.apply::future_lapply(cells.use, FUN = function(x) {
         return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
-    }, mc.cores = mc_cores)
+    })
+  # every.prob <- parallel::mclapply(X = cells.use, FUN = function(x) {
+        # return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
+    # }, mc.cores = mc_cores)
   every.prob  <-  do.call(cbind, every.prob)
   colnames(every.prob) <- cells.use
   object@spatial@final.prob <- data.frame(every.prob)

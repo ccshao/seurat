@@ -164,28 +164,34 @@ RefinedMapping <- function(object, genes.use) {
 InitialMapping <- function(object, cells.use = NULL, ncore = 2) {
   cells.use <- SetIfNull(x = cells.use, default = colnames(x = object@data))
 
-  browser()
-  every.prob2 <- sapply(
-    X = cells.use,
-    FUN = function(x) {
-      return(MapCell(
-        object = object,
-        cell.name = x,
-        do.plot = FALSE,
-        safe.use = FALSE
-      ))
-    })
+  # browser()
+  # system.time(
+  # every.prob2 <- sapply(
+  #   X = cells.use[1:500],
+  #   FUN = function(x) {
+  #     return(MapCell(
+  #       object = object,
+  #       cell.name = x,
+  #       do.plot = FALSE,
+  #       safe.use = TRUE
+  #     ))
+  #   })
+  # )
 
-  #- parallel
-  future::plan(multiprocess, workers = ncore)
-  every.prob <- future.apply::future_lapply(cells.use, FUN = function(x) {
+  #- parallel by future
+  future::plan(future::multiprocess, workers = ncore)
+  # system.time(
+  every.prob <- future.apply::future_sapply(cells.use, FUN = function(x) {
         return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
     })
-  # every.prob <- parallel::mclapply(X = cells.use, FUN = function(x) {
-        # return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
-    # }, mc.cores = mc_cores)
-  every.prob  <-  do.call(cbind, every.prob)
-  colnames(every.prob) <- cells.use
+  # )
+
+  # every.prob3 <- parallel::mclapply(X = cells.use[1:500], FUN = function(x) {
+  #       return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
+  # }, mc.cores = ncore)
+  # every.prob3 <-  do.call(cbind, every.prob3)
+  # colnames(every.prob) <- cells.use
+
   object@spatial@final.prob <- data.frame(every.prob)
   rownames(x = object@spatial@final.prob) <- paste0("bin.", rownames(x = object@spatial@final.prob))
   return(object)

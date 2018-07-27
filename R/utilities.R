@@ -808,26 +808,28 @@ AddImputedScore <- function(
   genes.use <- genes.use[genes.use %in% rownames(x = object@data)]
   genes.fit <- genes.fit[genes.fit %in% rownames(x = object@data)]
   lasso.input <- t(x = object@data[genes.use, ])
-  browser()
-  lasso.fits2 <- data.frame(t(
-    x = sapply(
-      X = genes.fit,
-      FUN = function(x) {
-        return(
-          lasso.fxn(
-            lasso.input = as.matrix(t(x = object@data[genes.use[genes.use != x], ])),
-            genes.obs = object@data[x, ],
-            s.use = s.use,
-            gene.name = x,
-            do.print = do.print,
-            gram = gram
-          )
-        )
-      }
-    )
-  ))
-
-  future::plan(multiprocess, workers = ncore)
+  # browser()
+  # system.time(
+  # lasso.fits2 <- data.frame(t(
+  #   x = sapply(
+  #     X = genes.fit,
+  #     FUN = function(x) {
+  #       return(
+  #         lasso.fxn(
+  #           lasso.input = as.matrix(t(x = object@data[genes.use[genes.use != x], ])),
+  #           genes.obs = object@data[x, ],
+  #           s.use = s.use,
+  #           gene.name = x,
+  #           do.print = do.print,
+  #           gram = gram
+  #         )
+  #       )
+  #     }
+  #   )
+  # ))
+  # )
+  future::plan(future::multiprocess, workers = ncore)
+  # system.time(
   lasso.fits <- data.frame(t(
     x = future.apply::future_sapply(
       X = genes.fit,
@@ -845,24 +847,7 @@ AddImputedScore <- function(
       }
     )
   ))
-  #- not tested
-  # lasso.fits <- mclapply(
-  #     X = genes.fit,
-  #     FUN = function(x) {
-  #       return(
-  #         lasso.fxn(
-  #           lasso.input = as.matrix(t(x = object@data[genes.use[genes.use != x], ])),
-  #           genes.obs = object@data[x, ],
-  #           s.use = s.use,
-  #           gene.name = x,
-  #           do.print = do.print,
-  #           gram = gram
-  #         )
-  #       )
-  #     }
-  #   , mc.cores = mc_cores)
-  # lasso.fits <- do.call(cbind, lasso.fits)
-  # colnames(lasso.fits) <- genes.fit
+  # )
 
   genes.old <- genes.fit[genes.fit %in% rownames(x = object@imputed)]
   genes.new <- genes.fit[! (genes.fit %in% rownames(x = object@imputed))]

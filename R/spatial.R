@@ -164,8 +164,6 @@ RefinedMapping <- function(object, genes.use) {
 InitialMapping <- function(object, cells.use = NULL, ncore = 2) {
   cells.use <- SetIfNull(x = cells.use, default = colnames(x = object@data))
 
-  # browser()
-  # system.time(
   # every.prob2 <- sapply(
   #   X = cells.use[1:500],
   #   FUN = function(x) {
@@ -176,21 +174,12 @@ InitialMapping <- function(object, cells.use = NULL, ncore = 2) {
   #       safe.use = TRUE
   #     ))
   #   })
-  # )
 
   #- parallel by future
   future::plan(future::multiprocess, workers = ncore)
-  # system.time(
   every.prob <- future.apply::future_sapply(cells.use, FUN = function(x) {
         return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
-    })
-  # )
-
-  # every.prob3 <- parallel::mclapply(X = cells.use[1:500], FUN = function(x) {
-  #       return(MapCell(object = object, cell.name = x, do.plot = FALSE, safe.use = TRUE))
-  # }, mc.cores = ncore)
-  # every.prob3 <-  do.call(cbind, every.prob3)
-  # colnames(every.prob) <- cells.use
+  })
 
   object@spatial@final.prob <- data.frame(every.prob)
   rownames(x = object@spatial@final.prob) <- paste0("bin.", rownames(x = object@spatial@final.prob))
